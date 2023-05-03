@@ -30,7 +30,7 @@ reference:
 # directory structure for input and output files
 
 datadirs:
-  fastq: $sourcedir/demo_data
+  fastq: $sourcedir
   qc: $sourcedir/qc_output
   trim: $sourcedir/trimmed_files
   bam: $sourcedir/pass1
