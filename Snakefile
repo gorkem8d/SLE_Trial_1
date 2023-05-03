@@ -10,10 +10,10 @@ import glob, os
 
 
 # A snakemake regular expression matching the forward mate FASTQ files.
-SAMPLES, = glob_wildcards(config['datadirs']['fastq'] + "/" + "{file}_1.fq.gz")
+SAMPLES, = glob_wildcards(config['datadirs']['fastq'] + "/" + "{file}.fq.gz")
 
 # Patterns for the 1st mate and the 2nd mate using the 'sample' wildcard.
-READS = ["1", "2"]
+#READS = ["1", "2"]
 
 # List of "{sample}.g.vcf.gz"
 # used for rule "combineGVCFs"
@@ -61,11 +61,11 @@ rule fastqc:
 #Trimmming of the illumina adapters.
 rule trim_galore_pe:
     input:
-      f1 = config['datadirs']['fastq'] + "/" + "{file}_1.fq.gz",
-      f2 = config['datadirs']['fastq'] + "/" + "{file}_1.fq.gz"
+      f1 = config['datadirs']['fastq'] + "/" + "{file}.fastq",
+#      f2 = config['datadirs']['fastq'] + "/" + "{file}_1.fq.gz"
     output:
-      fwd_pai = config['datadirs']['trim'] + "/" + "{file}_1_val_1.fq.gz",
-      rev_pai = config['datadirs']['trim'] + "/" + "{file}_2_val_2.fq.gz",
+      fwd_pai = config['datadirs']['trim'] + "/" + "{file}.fq.gz",
+#      rev_pai = config['datadirs']['trim'] + "/" + "{file}_2_val_2.fq.gz",
     params:
       extra = " -j 8 --illumina -q 20 --phred33 --length 20",  
       prefix =  config['datadirs']['trim'],
@@ -74,7 +74,7 @@ rule trim_galore_pe:
     shell:""" 
         trim_galore \
         {params.extra} \
-        --paired {input.f1} {input.f2} \
+        {input.f1} \
         -o {params.prefix} \
         --fastqc
          """
@@ -83,8 +83,8 @@ rule trim_galore_pe:
 # 2. Count the number of reads supporting each splice junction.
 rule pass1:
    input:
-      f1 = config['datadirs']['trim'] + "/" + "{file}_1_val_1.fq.gz",
-      f2 = config['datadirs']['trim'] + "/" + "{file}_2_val_2.fq.gz",
+      f1 = config['datadirs']['trim'] + "/" + "{file}.fq.gz",
+   #   f2 = config['datadirs']['trim'] + "/" + "{file}_2_val_2.fq.gz",
       queue = rules.trim_galore_pe.output.rev_pai
    output: config['datadirs']['bam'] + "/" + "{file}_SJ.out.tab", config['datadirs']['bam'] + "/" + "{file}_Aligned.toTranscriptome.out.bam"
    params:
@@ -97,7 +97,7 @@ rule pass1:
         STAR  \
         --runThreadN {threads} \
         --genomeDir {params.genomedir} \
-        --readFilesIn {input.f1} {input.f2} \
+        --readFilesIn {input.f1} \
         --readFilesCommand zcat \
         --outFileNamePrefix {params.prefix} \
         --outSAMtype None \
@@ -163,8 +163,8 @@ rule star_genome:
 # 4. Count the number of reads supporting each splice junction.         
 rule pass2:
    input:
-      f1 = config['datadirs']['trim'] + "/" + "{file}_1_val_1.fq.gz",
-      f2 = config['datadirs']['trim'] + "/" + "{file}_2_val_2.fq.gz",
+      f1 = config['datadirs']['trim'] + "/" + "{file}.fq.gz",
+#      f2 = config['datadirs']['trim'] + "/" + "{file}_2_val_2.fq.gz",
       line = rules.star_genome.output.starindex
    output: config['datadirs']['pass2'] + "/" + "{file}_Aligned.toTranscriptome.out.bam", config['datadirs']['pass2'] + "/" + "{file}_Aligned.sortedByCoord.out.bam"
    params:
@@ -177,7 +177,7 @@ rule pass2:
         STAR  \
         --runThreadN {threads} \
         --genomeDir {params.genomedir} \
-        --readFilesIn {input.f1} {input.f2} \
+        --readFilesIn {input.f1} \
         --readFilesCommand zcat \
         --outFileNamePrefix {params.prefix} \
         --outSAMtype BAM SortedByCoordinate \
