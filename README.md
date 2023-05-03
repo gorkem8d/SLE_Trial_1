@@ -1,1 +1,1 @@
-# SLE_Trial_1
+# To try the GATK pipeline
