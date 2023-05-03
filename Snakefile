@@ -10,7 +10,7 @@ import glob, os
 
 
 # A snakemake regular expression matching the forward mate FASTQ files.
-SAMPLES, = glob_wildcards(config['datadirs']['fastq'] + "/" + "{file}.fq.gz")
+SAMPLES, = glob_wildcards(config['datadirs']['fastq'] + "/" + "{file}.fastq")
 
 # Patterns for the 1st mate and the 2nd mate using the 'sample' wildcard.
 #READS = ["1", "2"]
@@ -47,7 +47,7 @@ rule all:
 # QC of raw fastq files.
 rule fastqc:
    input:
-      f1 = config['datadirs']['fastq'] + "/" + "{file}_{read}.fq.gz"
+      f1 = config['datadirs']['fastq'] + "/" + "{file}_{read}.fastq"
    output: config['datadirs']['qc'] + "/" + "{file}_{read}_fastqc.html", config['datadirs']['qc'] + "/" + "{file}_{read}_fastqc.zip"
    params:
       prefix =  config['datadirs']['qc'],
