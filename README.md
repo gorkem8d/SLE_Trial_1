@@ -43,7 +43,7 @@ The step calls the SNPs and indels simultaneously via local de-novo assembly of 
 
  #### Index the genome for 1st pass allignment, the 2nd pass allignemnt uses the new index from merged SJ.out.tab files from the  script
 ```
- STAR  --runMode genomeGenerate --runThreadN 24 --genomeDir ./ --genomeFastaFiles hg38.fa   --sjdbGTFfile gencode.v30.annotation.gtf 
+ STAR  --runMode genomeGenerate --runThreadN 24 --genomeDir ./ --genomeFastaFiles GRCh37_latest_genomic.fna   --sjdbGTFfile gencode.v19.annotation.gtf 
 ```
 
 #### To Run the pipeline on cluster using this command 'modify cluster.json  parameters according to your cluster configuration 
